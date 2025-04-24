@@ -1,4 +1,4 @@
-node_modules
+# node_modules
 npm-debug.log
 build
 logs
@@ -6,3 +6,4 @@ logs/*
 .git
 *.md
 .gitignore
+npm-debug.log
