@@ -11,6 +11,21 @@ module.exports = {
         }
     },
 
+    async getAllBooksAsyncCallback(req, res) {
+        try {
+            const books = await Book.findAll({ include: [Review] });
+
+            const handleResponse = (data) => {
+                res.Response({ data: data });
+            };
+
+            handleResponse(books);
+
+        } catch (error) {
+            res.status(400).Response({ message: error.message });
+        }
+    },
+
     async getBookByISBN(req, res) {
         try {
             const book = await Book.findOne({ where: { isbn: req.params.isbn } });
@@ -23,12 +38,65 @@ module.exports = {
         }
     },
 
+    async findBookByISBNPromise(req, res) {
+        const isbn = req.params.isbn;
+
+        Book.findOne({ where: { isbn: isbn } })
+            .then((book) => {
+                if (!book) {
+                    return res.status(404).Response({ message: `Book with ISBN ${isbn} not found!` });
+                }
+                res.Response({ data: book });
+            })
+            .catch((error) => {
+                res.status(400).Response({ message: error.message });
+            });
+    }
+    ,
+
     async getBookByAuthor(req, res) {
         try {
             const books = await Book.findAll({ where: { author: req.params.author } });
-            // if (books.length === 0) {
-            //     return res.status(404).Response({ message: `No books found for author ${req.params.author}!` });
-            // }
+            res.Response({ data: books });
+        } catch (error) {
+            res.status(400).Response({ message: error.message });
+        }
+    },
+
+    async findBooksByAuthorPromise(req, res) {
+        const author = req.params.author;
+
+        Book.findAll({ where: { author: author } })
+            .then((books) => {
+                if (books.length === 0) {
+                    return res.status(404).Response({ message: `No books found by author ${author}` });
+                }
+                res.Response({ data: books });
+            })
+            .catch((error) => {
+                res.status(400).Response({ message: error.message });
+            });
+    },
+
+    async findBooksByTitlePromise(req, res) {
+        const title = req.params.title;
+
+        Book.findAll({ where: { title: title } })
+            .then((books) => {
+                if (books.length === 0) {
+                    return res.status(404).Response({ message: `No books found with title ${title}` });
+                }
+                res.Response({ data: books });
+            })
+            .catch((error) => {
+                res.status(400).Response({ message: error.message });
+            });
+    },
+
+
+    async getBookByTitle(req, res) {
+        try {
+            const books = await Book.findAll({ where: { title: req.params.title } });
             res.Response({ data: books });
         } catch (error) {
             res.status(400).Response({ message: error.message });
@@ -39,7 +107,7 @@ module.exports = {
         try {
             const book = await Book.findByPk(req.params.id, { include: [Review] });
             if (!book) {
-                return res.status(404).Response({ message: `Book ${req.params.id} not found!`  });
+                return res.status(404).Response({ message: `Book ${req.params.id} not found!` });
             }
             res.Response({ data: book });
         } catch (error) {
@@ -83,12 +151,12 @@ module.exports = {
 
             const result = await Book.destroy({ where: { id: id } });
             if (!result) {
-                return res.status(404).Response({ message: `Book ${id} not found!`  });
+                return res.status(404).Response({ message: `Book ${id} not found!` });
             }
             res.Response({ message: "Book deleted successfully!" });
         } catch (error) {
             console.log(error);
-            
+
             res.status(400).Response({ message: error.message });
         }
     },
@@ -100,6 +168,18 @@ module.exports = {
             res.Response({ data: review });
         } catch (error) {
             next(error);
+        }
+    },
+
+    async getBookReviews(req, res) {
+        try {
+            const book = await Book.findByPk(req.params.id, { include: [Review] });
+            if (!book) {
+                return res.status(404).Response({ message: `Book ${req.params.id} not found!` });
+            }
+            res.Response({ data: book.Reviews });
+        } catch (error) {
+            res.status(400).Response({ message: error.message });
         }
     },
 
@@ -128,4 +208,27 @@ module.exports = {
             res.status(400).Response({ message: error.message });
         }
     },
+
+    async removeUserReview(req, res) {
+        try {
+            const review = await Review.findByPk(req.params.id);
+            if (!review) {
+                return res.status(404).Response({ message: "Review not found!" });
+            }
+
+            if (review.userId !== req.user.id) {
+                return res.status(403).Response({ message: "You are not authorized to delete this review!" });
+            }
+
+            const result = await Review.destroy({ where: { id: req.params.id } });
+            if (!result) {
+                return res.status(404).Response({ message: "Review not found!" });
+            }
+
+            res.Response({ message: "Review deleted successfully!" });
+        } catch (error) {
+            res.status(400).Response({ message: error.message });
+        }
+    }
+
 };
