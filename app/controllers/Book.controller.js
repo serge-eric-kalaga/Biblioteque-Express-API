@@ -63,12 +63,20 @@ module.exports = {
 
     async deleteBook(req, res) {
         try {
-            const result = await Book.destroy({ where: { id: req.params.id } });
+            // verify if id is valid
+            const id = parseInt(req.params.id);
+            if (isNaN(id)) {
+                return res.status(400).Response({ message: "Invalid ID format!" });
+            }
+
+            const result = await Book.destroy({ where: { id: id } });
             if (!result) {
-                return res.status(404).Response({ message: `Book ${req.params.id} not found!`  });
+                return res.status(404).Response({ message: `Book ${id} not found!`  });
             }
             res.Response({ message: "Book deleted successfully!" });
         } catch (error) {
+            console.log(error);
+            
             res.status(400).Response({ message: error.message });
         }
     },
