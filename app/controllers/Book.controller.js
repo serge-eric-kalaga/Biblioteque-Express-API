@@ -23,6 +23,18 @@ module.exports = {
         }
     },
 
+    async getBookByAuthor(req, res) {
+        try {
+            const books = await Book.findAll({ where: { author: req.params.author } });
+            // if (books.length === 0) {
+            //     return res.status(404).Response({ message: `No books found for author ${req.params.author}!` });
+            // }
+            res.Response({ data: books });
+        } catch (error) {
+            res.status(400).Response({ message: error.message });
+        }
+    },
+
     async getBookById(req, res) {
         try {
             const book = await Book.findByPk(req.params.id, { include: [Review] });

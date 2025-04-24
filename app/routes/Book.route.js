@@ -7,7 +7,8 @@ const bookRouter = express.Router();
 
 const {
     getAllBooks,
-    getBookByISBN,
+    getBookByISBN, 
+    getBookByAuthor,
     getBookById,
     createBook,
     updateBook,
@@ -22,6 +23,8 @@ bookRouter.get("/", getAllBooks);
 bookRouter.get("/:id", getBookById);
 
 bookRouter.get("/isbn/:isbn", getBookByISBN);
+
+bookRouter.get("/author/:author", getBookByAuthor);
 
 bookRouter.delete("/:id", deleteBook);
 

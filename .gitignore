@@ -43,6 +43,7 @@ data/postgres/*
 data/redis/*
 data/prometheus/*
 data/grafana/*
+img/*
 
 monitoring/grafana/grafana_data/*
 monitoring/prometheus/prometheus_data/*
