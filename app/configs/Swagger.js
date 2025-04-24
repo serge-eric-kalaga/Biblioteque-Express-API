@@ -1,28 +1,34 @@
-module.exports.options = {
+bodyParser = require("body-parser"),
+swaggerJsdoc = require("swagger-jsdoc"),
+swaggerUi = require("swagger-ui-express");
+const path = require("path");
+
+const options = {
     definition: {
-      openapi: "3.1.0",
+      openapi: "3.0.0",
       info: {
-        title: "LogRocket Express API with Swagger",
-        version: "0.1.0",
+        title: "API Express JS Bibliothèque",
+        version: "1.0.0",
         description:
-          "This is a simple CRUD API application made with Express and documented with Swagger",
-        license: {
-          name: "MIT",
-          url: "https://spdx.org/licenses/MIT.html",
-        },
+          "API pour gérer une bibliothèque de livres et d'utilisateurs",
         contact: {
-          name: "LogRocket",
-          url: "https://logrocket.com",
-          email: "info@email.com",
+          name: "Serge Eric KALAGA",
+          url: "https://github.com/serge-eric-kalaga",
+          email: "kalagaserge4@gmail.com",
         },
       },
       servers: [
         {
-          url: "http://localhost:3000",
+          url: "http://localhost:5000",
         },
       ],
     },
-    apis: ["./routes/*.js"],
+    apis: [path.join(__dirname, "../routes/*.route.js")], // Correction du chemin pour inclure les fichiers de routes
   };
 
   
+const swaggerSpec = swaggerJsdoc(options);
+
+// console.log("Swagger generated spec:", JSON.stringify(swaggerSpec, null, 2));
+
+module.exports.swaggerSpec = swaggerSpec;

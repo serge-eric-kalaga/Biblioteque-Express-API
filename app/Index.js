@@ -8,10 +8,12 @@ const loggerMiddleware = require("./middlewares/Logger");
 const globalErrorHandler = require("./middlewares/ErrorHandler");
 const Response = require("./middlewares/Response");
 const { InitUser } = require("./configs/InitData");
-const { updateMetrics, Metrics } = require('./middlewares/Metrics');
+// const { updateMetrics, Metrics } = require('./middlewares/Metrics');
+const swaggerSpec = require("./configs/Swagger");
 
 // ============ Import Routes
 const userRouter = require("./routes/User.route");
+const bookRouter = require("./routes/Book.route"); 
 
 const PORT = process.env.PORT;
 
@@ -19,10 +21,12 @@ require("dotenv").config();
 
 const app = express();
 
+
+// ============ Middleware Use 
 app.use(express.json());
 app.use(loggerMiddleware);
 app.use(Response);
-app.use(updateMetrics);
+// app.use(updateMetrics);
 // app.use(pino)
 
 app.get("/", (req, res, next) => {
@@ -31,9 +35,16 @@ app.get("/", (req, res, next) => {
   });
 });
 
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+)
+
 
 // My routers
 app.use("/users", userRouter);
+app.use("/books", bookRouter); 
 // app.use("/api-docs", swaggerRouter);
 
 
@@ -44,7 +55,7 @@ app.get("/error-test", (req, res, next) => {
   throw error;
 });
 
-app.get('/metrics', Metrics);
+// app.get('/metrics', Metrics);
 
 app.all("/", (req, res, next) => {
   res.status(404).Response({ message: "Url non trouvée" });
