@@ -1,4 +1,5 @@
 const { Book, Review, CreateBookModel, UpdateBookModel, CreateReviewModel, UpdateReviewModel } = require("../models/Models");
+const {generateISBN } = require("../utils/Functions");
 
 module.exports = {
   async getAllBooks(req, res) {
@@ -13,6 +14,7 @@ module.exports = {
   async createBook(req, res, next) {
     try {
       await CreateBookModel.validateAsync(req.body);
+      req.body.isbn = generateISBN();
       const newBook = await Book.create(req.body);
       res.Response({ data: newBook });
     } catch (error) {
