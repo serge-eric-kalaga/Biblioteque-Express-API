@@ -15,4 +15,4 @@ module.exports = {
   UpdateReviewModel,
 };
 
-DB.sync({ force: true });
+// DB.sync({ force: true });

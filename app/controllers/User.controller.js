@@ -18,6 +18,17 @@ module.exports = {
     async createUser(req, res, next) {
         try {
             CreateUserModel.validateAsync(req.body).then(async (value) => {
+
+                // Check if the username already exists
+                const existingUser = await User.findOne({
+                    where: {
+                        username: req.body.username
+                    }
+                });
+                if (existingUser) {
+                    return res.status(400).Response({ message: "Username already exists !" });
+                }
+
                 const newUser = await User.create({
                     nom_prenom: req.body.nom_prenom,
                     username: req.body.username,
@@ -37,7 +48,9 @@ module.exports = {
             const user = await User.findOne({
                 where: {
                     username: req.params.username
-                }
+                },
+                order: [["createdAt", "DESC"]], 
+                attributes: ["id", "nom_prenom", "username", "createdAt", "updatedAt"]
             })
             if (!user) {
                 res.status(404).Response({ message: "User not found !" })
